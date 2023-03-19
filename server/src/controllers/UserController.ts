@@ -8,12 +8,9 @@ export const createUserController = async (request:Request, response: Response) 
 
   const {name, email, password, accessName} = request.body
 
-  const userAlreadyExists = await prisma.user.findFirst({
+  const userAlreadyExists = await prisma.user.findUnique({
     where: {
-      email: {
-          equals: email,
-
-      }
+   email
    }
   })
 
@@ -24,7 +21,7 @@ export const createUserController = async (request:Request, response: Response) 
   const accessExists = await prisma.access.findFirst({
     where: {
       name: {
-          equals: name,
+          equals: accessName,
 
       }
    }
@@ -49,6 +46,17 @@ export const createUserController = async (request:Request, response: Response) 
         }
       }
       
+    },
+    select:{
+      id: true,
+      name: true,
+      email: true,
+      Access: {
+        select:{
+          name: true
+        }
+      }
+
     }
   })
 
