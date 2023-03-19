@@ -6,7 +6,7 @@ import { hash } from 'bcrypt'
 
 export const createUserController = async (request:Request, response: Response) => {
 
-  const {name, email, password} = request.body
+  const {name, email, password, accessName} = request.body
 
   const userAlreadyExists = await prisma.user.findFirst({
     where: {
@@ -18,16 +18,37 @@ export const createUserController = async (request:Request, response: Response) 
   })
 
   if(userAlreadyExists){
-    throw new Error("Usuário ja cadastrado");
-    
+    throw new Error("Usuário ja cadastrado");    
   }
+
+  const accessExists = await prisma.access.findFirst({
+    where: {
+      name: {
+          equals: name,
+
+      }
+   }
+  })
+
+  if(!accessExists!){
+    throw new Error("Access não cadastrado");    
+  }
+
+
+
   const hadhPassword = await hash(password, 10)
 
   const user = await prisma.user.create({
     data:{
       name,
       email,
-      password: hadhPassword
+      password: hadhPassword,
+      Access:{
+        connect:{
+          name: accessName
+        }
+      }
+      
     }
   })
 
