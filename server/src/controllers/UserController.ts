@@ -40,9 +40,13 @@ export const createUserController = async (request:Request, response: Response) 
       name,
       email,
       password: hadhPassword,
-      Access:{
-        connect:{
-          name: accessName
+      userAccess:{
+        create:{
+          Access: {
+            connect:{
+              name: accessName
+            }
+          }
         }
       }
       
@@ -51,9 +55,13 @@ export const createUserController = async (request:Request, response: Response) 
       id: true,
       name: true,
       email: true,
-      Access: {
+      userAccess:{
         select:{
-          name: true
+          Access:{
+            select: {
+              name: true
+            }
+          }
         }
       }
 
@@ -65,4 +73,25 @@ export const createUserController = async (request:Request, response: Response) 
 
 
   
+}
+
+export const getAllUser =async (request:Request, response: Response) => {
+const users = await prisma.user.findMany({
+  select:{
+    id: true,
+    name: true,
+    email: true,
+    userAccess:{
+      select:{
+        Access:{
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+
+  }
+})
+  return response.json(users)
 }
